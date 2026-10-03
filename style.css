@@ -1,0 +1,296 @@
+/* ============================================================
+ М АНИПУЛЯТОРЫ · ЕТЗ 2026–27 — полная тема «полигон»               *
+ Палитра = цвета из renderPolygon():
+ зона1 #e9ebf1 | зазоры/фон #d7dae2 | зона2 #c8cf95
+ поле  #f6ea9c | рамка    #2a3040 | границы зон #8a93a8
+ Панель светлая; осциллограф и HUD-графики — тёмные плитки.
+ ============================================================ */
+:root{
+  /* --- цвета полигона (источник истины) --- */
+  --z1:#e9ebf1;        /* зона 1 — фон панели                       */
+  --poly:#d7dae2;      /* фон полигона / зазоры 5 мм — фон групп     */
+  --z2:#c8cf95;        /* зона 2 — зелёный акцент кнопок/слайдеров   */
+  --z2d:#7e8c3f;       /* зона 2 потемнее — читаемый текст на свете  */
+  --field:#f6ea9c;     /* операционное поле — активная схема/ховер   */
+  --field-d:#b9a244;   /* граница поля                               */
+  --frame:#2a3040;     /* внешняя рамка полигона — заголовки/текст   */
+  --line:#8a93a8;      /* границы зон — разделители                  */
+
+  /* --- производные для UI --- */
+  --bg:var(--z1);
+  --panel:var(--z1);
+  --panel2:var(--poly);
+  --card:#ffffff;
+  --txt:#1c2230;
+  --muted:#5f6b82;
+  --accent:var(--z2d);
+  --accent-h:#6f7d33;
+  --ok:#2f8f4e;
+  --warn:#c0392b;      /* срыв / проскальзывание шашки               */
+  --sel:#b9760a;       /* выбранная клетка — янтарный как поле       */
+  --moving:#2a5fb0;
+  --edge:#c4cad6;      /* рамки полей ввода на светлом               */
+  --edge2:#b9c0cf;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg);
+  color:var(--txt);
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+  overflow:hidden;
+}
+
+#app{display:flex;height:100vh;width:100vw}
+
+/* ---------------- левая панель ---------------- */
+#panel{
+width:330px;flex:0 0 330px;height:100%;
+background:var(--panel);
+border-right:2px solid var(--line);
+padding:12px;overflow-y:auto;
+scrollbar-width:thin;scrollbar-color:var(--line) transparent;
+}
+#panel::-webkit-scrollbar{width:8px}
+#panel::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px}
+#panel h1{
+font-size:14px;margin:0 0 2px;letter-spacing:.5px;
+color:var(--frame);font-weight:800;text-transform:uppercase;
+}
+#panel .sub,#panel>.sub{font-size:10px;color:var(--muted);margin:0 0 10px}
+
+/* ---------------- группы-«зоны» ---------------- */
+.group{
+  background:var(--panel2);
+  border:1px solid var(--edge2);
+  border-left:4px solid var(--z2);     /* отсылка к зелёной зоне 2 */
+  border-radius:9px;
+  padding:9px 10px;margin:0 0 9px;
+}
+.group .lbl{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;font-weight:700;letter-spacing:.4px;
+  color:var(--frame);text-transform:uppercase;margin-bottom:6px;
+}
+.lbl .val{
+  font-family:ui-monospace,monospace;font-weight:600;
+  color:var(--muted);text-transform:none;font-size:10px;
+}
+.hint{font-size:9px;line-height:1.45;color:var(--muted);margin-top:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px 8px}
+.grid2 label,.group>label,.group label{
+  display:flex;flex-direction:column;gap:2px;
+  font-size:9px;color:var(--muted);font-weight:600;
+}
+
+/* ---------------- поля ввода ---------------- */
+input[type=number],select{
+  width:100%;background:var(--card);color:var(--txt);
+  border:1px solid var(--edge);border-radius:5px;
+  padding:4px 5px;font-family:ui-monospace,monospace;font-size:11px;
+}
+input[type=number]:focus,select:focus{
+  outline:none;border-color:var(--accent);
+  box-shadow:0 0 0 2px rgba(126,140,63,.25);
+}
+select{font-family:system-ui,sans-serif;font-size:11px;padding:5px}
+
+/* ---------------- кнопки ---------------- */
+button{
+  padding:7px 8px;border-radius:7px;cursor:pointer;
+  background:var(--accent);color:#fff;border:none;
+  font-size:11px;font-weight:700;letter-spacing:.3px;
+  transition:background .12s,transform .05s;
+}
+button:hover{background:var(--accent-h)}
+button:active{transform:translateY(1px)}
+.btn-row{display:flex;gap:4px;margin-top:6px}
+.btn-row button{flex:1;font-size:10px}
+
+/* кнопки схем — как полосы зоны 2 / поля */
+.sch-btn{
+  flex:1;background:var(--card);color:var(--txt);
+  border:1px solid var(--edge);border-radius:6px;
+  padding:6px 4px;font-size:11px;font-weight:700;
+}
+.sch-btn:hover{background:var(--field);border-color:var(--field-d)}
+.sch-btn.active{
+  background:var(--field);color:var(--frame);
+  border-color:var(--field-d);box-shadow:inset 0 0 0 1px var(--field-d);
+}
+.sch-row,#scheme-row{display:flex;gap:4px}
+
+/* ---------------- слайдеры ---------------- */
+.slider-row{display:flex;flex-direction:column;gap:3px;margin:6px 0}
+.slider-row .top{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:10px;color:var(--muted);font-weight:600;
+}
+.slider-row .top .v,.slider-row .val{font-family:ui-monospace,monospace;color:var(--txt)}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:4px;
+  background:var(--edge2);border-radius:3px;accent-color:var(--accent);
+  cursor:pointer;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;appearance:none;width:14px;height:14px;
+  border-radius:50%;background:var(--accent);border:2px solid #fff;
+  box-shadow:0 1px 3px rgba(0,0,0,.25);cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:14px;height:14px;border-radius:50%;background:var(--accent);
+  border:2px solid #fff;cursor:pointer;
+}
+
+/* ---------------- чекбоксы ---------------- */
+.chk{
+  display:flex;align-items:center;gap:6px;
+  font-size:10px;color:var(--txt);margin:3px 0;cursor:pointer;
+}
+.chk input,input[type=checkbox]{accent-color:var(--accent);width:13px;height:13px;cursor:pointer}
+
+/* ---------------- legacy-статус (если #status ещё в DOM) ---- */
+#status{
+background:var(--card);
+border:1px solid var(--edge2);border-radius:9px;padding:9px;
+font-family:ui-monospace,monospace;font-size:10px;line-height:1.7;
+color:var(--muted);
+}
+#status .v{color:var(--txt);font-weight:600}
+#status .warn{color:var(--warn);font-weight:700}
+#status .ok{color:var(--ok)}
+#status .sel{color:var(--sel);font-weight:700}
+#status .moving{color:var(--moving)}
+#status .hdr{color:var(--line);margin-top:6px;margin-bottom:2px;
+text-transform:uppercase;letter-spacing:.4px;font-size:9px}
+
+/* ---------------- сцена ---------------- */
+#stage{
+flex:1 1 auto;min-width:0;position:relative;
+background:var(--poly);                /* цвет зазоров полигона */
+}
+svg,#svg{display:block;width:100%;height:100%;cursor:grab}
+
+/* ---------------- осциллограф (тёмный экран прибора) -------- */
+.osc{
+  display:block;width:100%;height:62px;margin:3px 0;
+  background:#0c1322;
+  border:1px solid var(--frame);border-radius:6px;
+}
+
+/* ============================================================
+ H UD — плавающая панель телеметрии (сверху справа, перетаск.)     *
+ Ключевой принцип: полупрозрачность ТОЛЬКО в альфа-канале
+ фона (#hud{background:rgba(...)}), НИКАКОГО opacity на
+ контейнере — иначе бледнеет текст и кривые на canvas.
+ Полигон просвечивает сквозь стекло + blur; контент резкий.
+ ============================================================ */
+#hud{
+position:fixed; top:12px; right:12px;          /* фолбэк до инициализации JS-позиции */
+z-index:50;
+width:312px; max-width:calc(100vw - 24px);
+display:flex; flex-direction:column;
+background:rgba(255,255,255,.34);              /* ← альфа вместо opacity */
+-webkit-backdrop-filter:blur(12px) saturate(1.15);
+backdrop-filter:blur(12px) saturate(1.15);
+border:1px solid var(--line);
+border-left:4px solid var(--z2);
+border-radius:12px;
+box-shadow:0 6px 22px rgba(20,26,40,.18);
+transition:background-color .25s ease, box-shadow .25s ease, border-color .25s ease;
+font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+color:var(--txt); overflow:hidden;
+}
+#hud:hover{ background:rgba(255,255,255,.88); box-shadow:0 10px 30px rgba(20,26,40,.30); }
+
+/* тревога (срыв/проскальзывание шашки или недостижимая клетка) густеет фоном */
+#hud.alert{
+background:rgba(255,232,232,.92);
+border-color:var(--warn); border-left-color:var(--warn);
+animation:hudPulse 1.1s ease-in-out infinite;
+}
+@keyframes hudPulse{
+  0%,100%{ box-shadow:0 0 0 0 rgba(192,57,43,0), 0 6px 22px rgba(20,26,40,.25); }
+  50%    { box-shadow:0 0 0 4px rgba(192,57,43,.35), 0 6px 22px rgba(20,26,40,.25); }
+}
+
+/* гасим плавность на время перетаскивания (иначе панель «догоняет» курсор) */
+#hud.no-anim{ transition:none; }
+
+/* шапка — зона перетаскивания и сворачивания */
+.hud-head{
+  display:flex; align-items:center; gap:8px;
+  padding:7px 9px; cursor:grab; user-select:none;
+  background:linear-gradient(180deg, rgba(200,207,149,.35), rgba(200,207,149,.12));
+  border-bottom:1px solid var(--edge2);
+}
+.hud-head.dragging{ cursor:grabbing; }
+.hud-head .dot{
+  width:9px; height:9px; border-radius:50%; flex:0 0 auto;
+  background:var(--ok); box-shadow:0 0 0 2px rgba(255,255,255,.6);
+}
+.hud-head .dot.moving{ background:var(--moving); }
+.hud-head .dot.warn{ background:var(--warn); }
+.hud-head .ttl{
+  font-size:10px; font-weight:800; letter-spacing:.5px; text-transform:uppercase;
+  color:var(--frame); flex:1 1 auto; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.hud-head .chev{
+  font-size:11px; color:var(--muted); flex:0 0 auto;
+  transition:transform .2s ease;
+}
+#hud.collapsed .hud-head .chev{ transform:rotate(-90deg); }
+
+/* мини-строка — видна только в свёрнутом виде */
+.hud-mini{
+  display:none; align-items:center; gap:6px;
+  padding:5px 9px; font-family:ui-monospace,monospace; font-size:10px;
+  color:var(--txt); background:rgba(255,255,255,.35);
+  border-bottom:1px solid var(--edge2);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+#hud.collapsed .hud-mini{ display:flex; }
+.hud-mini b{ color:var(--frame); font-weight:700; }
+.hud-mini .m-ok{ color:var(--ok); }
+.hud-mini .m-warn{ color:var(--warn); font-weight:700; }
+.hud-mini .m-move{ color:var(--moving); }
+
+/* тело: графики + статистика; высоты уменьшены, чтобы влезало в угол */
+.hud-body{
+  padding:8px 9px 9px; max-height:min(58vh, 480px); overflow-y:auto;
+  scrollbar-width:thin; scrollbar-color:var(--line) transparent;
+  transition:max-height .28s ease, padding .28s ease, opacity .2s ease;
+}
+#hud.collapsed .hud-body{ max-height:0; padding-top:0; padding-bottom:0; opacity:0; overflow:hidden; }
+.hud-body::-webkit-scrollbar{ width:7px; }
+.hud-body::-webkit-scrollbar-thumb{ background:var(--line); border-radius:4px; }
+
+.hud-sec{
+  font-size:9px; font-weight:800; letter-spacing:.5px; text-transform:uppercase;
+  color:var(--line); margin:8px 0 3px; border-bottom:1px solid var(--edge2); padding-bottom:2px;
+}
+.hud-sec:first-child{ margin-top:0; }
+
+/* ряды статистики: метка слева, значение справа моноширинно */
+.hud-row{ display:flex; justify-content:space-between; align-items:baseline; gap:8px;
+  font-size:10px; line-height:1.65; color:var(--muted); }
+  .hud-row .k{ flex:0 0 auto; }
+  .hud-row .v{ font-family:ui-monospace,monospace; color:var(--txt); font-weight:700; text-align:right; }
+  .hud-row .v.warn{ color:var(--warn); font-weight:700; }
+  .hud-row .v.ok{ color:var(--ok); }
+  .hud-row .v.sel{ color:var(--sel); font-weight:700; }
+  .hud-row .v.moving{ color:var(--moving); }
+  .hud-row .sub{ font-family:ui-monospace,monospace; color:var(--muted); font-weight:400; }
+
+  /* подписи под графиками */
+  .hud-cap{ font-size:8px; color:var(--muted); margin:-1px 0 4px; line-height:1.3; }
+
+  /* белая «обводка» тёмного текста — читается на любом просвечивающем фоне */
+  #hud .hud-head .ttl, #hud .hud-sec, #hud .hud-row .v, #hud .hud-row .k,
+  #hud .hud-mini, #hud .hud-mini b, #hud .hud-cap{
+  text-shadow:0 1px 2px rgba(255,255,255,.9), 0 0 1px rgba(255,255,255,.7);
+  }
+
+  /* адаптив: на узких экранах панель не давит сцену */
+  @media (max-width:760px){ #panel{ width:280px; flex-basis:280px; } }

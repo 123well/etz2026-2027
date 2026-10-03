@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Манипуляторы: 5R / RR / RP / PP</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <aside id="panel">
+    <h1>МАНИПУЛЯТОРЫ</h1>
+    <div class="sub">NEMA17 12В 0.6А · горизонтальная плоскость</div>
+
+    <div class="group">
+      <div class="lbl"><span>Схема</span></div>
+      <div class="btn-row">
+        <button class="sch-btn active" data-scheme="5R">5R</button>
+        <button class="sch-btn" data-scheme="RR">RR</button>
+        <button class="sch-btn" data-scheme="RP">RP</button>
+        <button class="sch-btn" data-scheme="PP">PP</button>
+      </div>
+      <div class="hint" id="sch-hint"></div>
+    </div>
+
+    <!-- 5R -->
+    <div class="group cfg-5R">
+      <div class="lbl"><span>5R — параметры (мм)</span></div>
+      <div class="grid2">
+        <label>L1<input type="number" id="5R-L1" value="150" step="5"></label>
+        <label>L2<input type="number" id="5R-L2" value="150" step="5"></label>
+        <label>L3a<input type="number" id="5R-L3a" value="150" step="5"></label>
+        <label>L3b<input type="number" id="5R-L3b" value="150" step="5"></label>
+        <label>P1.x<input type="number" id="5R-P1x" value="-40" step="5"></label>
+        <label>P1.y<input type="number" id="5R-P1y" value="340" step="5"></label>
+        <label>P2.x<input type="number" id="5R-P2x" value="-40" step="5"></label>
+        <label>P2.y<input type="number" id="5R-P2y" value="380" step="5"></label>
+      </div>
+    </div>
+
+    <!-- RR -->
+    <div class="group cfg-RR" style="display:none">
+      <div class="lbl"><span>RR — параметры (мм)</span></div>
+      <div class="grid2">
+        <label>L1<input type="number" id="RR-L1" value="150" step="5"></label>
+        <label>L2<input type="number" id="RR-L2" value="150" step="5"></label>
+        <label>P1.x<input type="number" id="RR-P1x" value="-80" step="5"></label>
+        <label>P1.y<input type="number" id="RR-P1y" value="230" step="5"></label>
+      </div>
+    </div>
+
+    <!-- RP -->
+    <div class="group cfg-RP" style="display:none">
+      <div class="lbl"><span>RP — параметры</span></div>
+      <div class="grid2">
+        <label>L1, мм<input type="number" id="RP-L1" value="150" step="5"></label>
+        <label>L3a, мм<input type="number" id="RP-L3a" value="150" step="5"></label>
+        <label>L3b, мм<input type="number" id="RP-L3b" value="150" step="5"></label>
+        <label>P1.x<input type="number" id="RP-P1x" value="-18" step="5"></label>
+        <label>P1.y<input type="number" id="RP-P1y" value="230" step="5"></label>
+        <label>угол рельса°<input type="number" id="RP-rail" value="0" step="15"></label>
+        <label>r шкива, мм<input type="number" id="RP-r" value="10" step="1"></label>
+        <label>s_min<input type="number" id="RP-smin" value="0" step="5"></label>
+        <label>s_max<input type="number" id="RP-smax" value="250" step="5"></label>
+      </div>
+    </div>
+
+    <!-- PP -->
+    <div class="group cfg-PP" style="display:none">
+      <div class="lbl"><span>PP — параметры (мм)</span></div>
+      <div class="grid2">
+        <label>P1.x<input type="number" id="PP-P1x" value="-40" step="5"></label>
+        <label>P1.y<input type="number" id="PP-P1y" value="60" step="5"></label>
+        <label>P2.x<input type="number" id="PP-P2x" value="-40" step="5"></label>
+        <label>P2.y<input type="number" id="PP-P2y" value="60" step="5"></label>
+        <label>рельс 1,°<input type="number" id="PP-rail1" value="0" step="15"></label>
+        <label>рельс 2,°<input type="number" id="PP-rail2" value="90" step="15"></label>
+        <label>s1_min<input type="number" id="PP-s1min" value="0" step="5"></label>
+        <label>s1_max<input type="number" id="PP-s1max" value="280" step="5"></label>
+        <label>s2_min<input type="number" id="PP-s2min" value="0" step="5"></label>
+        <label>s2_max<input type="number" id="PP-s2max" value="200" step="5"></label>
+      </div>
+    </div>
+
+    <!-- Общие лимиты R -->
+    <div class="group cfg-ang">
+      <div class="lbl"><span>Лимиты R-шарниров, °</span></div>
+      <div class="grid2">
+        <label>θ1min<input type="number" id="cfg-th1min" value="-120" step="5"></label>
+        <label>θ1max<input type="number" id="cfg-th1max" value="120" step="5"></label>
+        <label>θ2min<input type="number" id="cfg-th2min" value="-120" step="5"></label>
+        <label>θ2max<input type="number" id="cfg-th2max" value="120" step="5"></label>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="lbl"><span>Мотор NEMA17</span></div>
+      <div class="grid2">
+        <label>τ_stall, Н·м<input type="number" id="cfg-tau" value="0.16" step="0.01"></label>
+        <label>ω_0, рад/с<input type="number" id="cfg-omega" value="30" step="1"></label>
+      </div>
+    </div>
+
+    <div class="group">
+      <button id="cfg-reset">↺ Сбросить всё</button>
+    </div>
+
+    <div class="group">
+      <div class="lbl"><span id="q1-label">θ1 — цель</span><span class="val" id="q1-val">-45.0°</span></div>
+      <input type="range" id="q1-range" min="-120" max="120" step="0.1" value="-45">
+      <input type="number" id="q1-num" min="-120" max="120" step="0.1" value="-45">
+    </div>
+
+    <div class="group">
+      <div class="lbl"><span id="q2-label">θ2 — цель</span><span class="val" id="q2-val">-45.0°</span></div>
+      <input type="range" id="q2-range" min="-120" max="120" step="0.1" value="-45">
+      <input type="number" id="q2-num" min="-120" max="120" step="0.1" value="-45">
+    </div>
+
+    <div class="group">
+      <div class="lbl"><span>Целевая клетка</span></div>
+      <select id="cell-select"></select>
+    </div>
+
+    <div class="group">
+      <button id="home-btn">⌂ ДОМОЙ</button>
+    </div>
+
+    <div class="group">
+      <label class="chk"><input type="checkbox" id="chk-workspace"> Рабочая зона</label>
+      <label class="chk"><input type="checkbox" id="chk-sing"> Сингулярности</label>
+      <label class="chk"><input type="checkbox" id="chk-cells" checked> Клетки</label>
+      <label class="chk"><input type="checkbox" id="chk-sag" checked> Провисание PP</label>
+    </div>
+
+    <div class="group">
+      <div class="lbl"><span>Зум</span><span class="val" id="zoom-val">1.00×</span></div>
+      <input type="range" id="zoom-range" min="0.5" max="3" step="0.05" value="1.0">
+    </div>
+
+            <div class="group">
+          <div class="lbl"><span>Захват — электромагнит</span></div>
+          <label style="display:flex;flex-direction:column;gap:2px;font-size:10px;color:var(--muted)">модель силы
+            <select id="cap-model"><option value="circuit">магнитная цепь (NI, A, B_sat)</option><option value="emp">эмпирика F0/(1+(g/g0)²)</option></select>
+          </label>
+          <div class="grid2" style="margin-top:4px">
+            <label>NI, А·вит <input type="number" id="cap-NI" value="1200" step="50"></label>
+            <label>A полюса, мм² <input type="number" id="cap-Apole" value="80" step="5"></label>
+            <label>B нас., Тл <input type="number" id="cap-Bsat" value="1.6" step="0.1"></label>
+            <label>g железа, мм <input type="number" id="cap-gfe" value="3" step="0.5"></label>
+            <label>F0 (emp), Н <input type="number" id="cap-F0" value="8" step="0.5"></label>
+            <label>g0 (emp), мм <input type="number" id="cap-g0" value="1" step="0.1"></label>
+          </div>
+          <div class="grid2" style="margin-top:4px">
+            <label>крышка, мм <input type="number" id="cap-tlid" value="0.8" step="0.1"></label>
+            <label>допуск ±, мм <input type="number" id="cap-tol" value="0.5" step="0.1"></label>
+            <label>люфт, мм <input type="number" id="cap-glift" value="0" step="0.1"></label>
+            <label>μ трения <input type="number" id="cap-mu" value="0.35" step="0.05"></label>
+            <label>m шашки, кг <input type="number" id="cap-mpay" value="0.007" step="0.001"></label>
+          </div>
+      </div>
+  </aside>
+
+  <main id="stage">
+    <svg id="svg" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <marker id="arrow-x" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#2050ff"/>
+        </marker>
+        <marker id="arrow-y" viewBox="0 0 10 10" refX="9" refY="5"
+                markerWidth="5" markerHeight="5" orient="auto">
+          <path d="M0,0 L10,5 L0,10 z" fill="#2050ff"/>
+        </marker>
+      </defs>
+      <g id="g-polygon"></g>
+      <g id="g-sing"></g>
+      <g id="g-grid"></g>
+      <g id="g-ws"></g>
+      <g id="g-sel"></g>
+      <g id="g-arm"></g>
+    </svg>
+  </main>
+</div>
+  <!-- ===================== HUD: статистика + осциллограф ===================== -->
+  <aside id="hud" aria-label="Телеметрия манипулятора">
+    <div class="hud-head" id="hud-toggle" title="Свернуть / развернуть (двойной клик)">
+      <span class="dot" id="hud-dot"></span>
+      <span class="ttl">Телеметрия</span>
+      <span class="chev" id="hud-chev">▾</span>
+    </div>
+
+    <div class="hud-mini" id="hud-mini">—</div>
+
+    <div class="hud-body" id="hud-body">
+      <div class="hud-sec">Осциллограф</div>
+      <canvas id="osc-v" class="osc"></canvas>
+      <div class="hud-cap">|v| эффектора, мм/с · красный порог = 100 мм/с (ЕТЗ п.1.2)</div>
+      <canvas id="osc-a" class="osc"></canvas>
+      <div class="hud-cap">|a| эффектора, м/с²</div>
+      <canvas id="osc-f" class="osc"></canvas>
+      <div class="hud-cap">F: красная = требуемая, зелёный пунктир = удержание магнита; пересечение = срыв (ЕТЗ п.3.2)</div>
+
+      <div class="hud-sec">Моторы</div>
+      <div id="hud-stats"><!-- заполняет updateStatus() --></div>
+    </div>
+  </aside>
+<script src="kinematics.js"></script>
+<script src="physics.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
